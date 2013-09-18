@@ -48,11 +48,10 @@ def download(dropbox_dir, dest_dir, dir_struct, token_file):
         if item['is_dir']:
             ts = datetime(*parsedate_tz(item['modified'])[:6])
             dirname = os.path.split(item['path'])[1]
-            rel_path = dir_struct.format(year=ts.strftime("%Y"),
-                                         month=ts.strftime("%m"),
-                                         dirname=dirname)
-            dest_dir = os.path.join(dest_dir, rel_path)
-            download_dir(client, item['path'], dest_dir)
+            path = dir_struct.format(year=ts.strftime("%Y"),
+                                     month=ts.strftime("%m"),
+                                     dirname=dirname)
+            download_dir(client, item['path'], os.path.join(dest_dir, path))
 
 
 def download_dir(client, dropbox_dir, dest_dir):
