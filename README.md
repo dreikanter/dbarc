@@ -12,7 +12,7 @@ pip install -e git+git://github.com/dreikanter/dbarc#egg=dbarc
 
 Create a new app with [Dropbox App Console](https://www.dropbox.com/developers/apps) and get your app key and app secret.
 
-Run the following command to acquire API access token (use the actual values for _<dropbox_app_key>_ and _<dropbox_app_secret>_):
+Run the following command to acquire API access token (use the actual values for `<dropbox_app_key>` and `<dropbox_app_secret>`):
 
 ```bash
 dbarc init <dropbox_app_key> <dropbox_app_secret>
@@ -23,12 +23,12 @@ This will ask you to open a specific URL in the browser, authorize the tool to a
 Here is an example:
 
 ```bash
-$ dbarc init <dropbox_app_key> <dropbox_app_secret>
+$ dbarc init kjdfake8gkjssf e23aksfakelak9
 1. Go to: https://www.dropbox.com/1/oauth2/authorize?response_type=code&client_id=1
 2. Click "Allow" (you might have to log in first)
 3. Copy the authorization code.
 Enter the authorization code here:
-KHQP1FRIYEPIUQDH4IUEHFOHDIUAW7IUAHEIUWEHDIW
+KHFAKERIYEPIUQDH4FAKEFOHDIUAW7IUAHEEFAKEDIW
 Linked account: John Doe <john.doe@example.com>
 ```
 
