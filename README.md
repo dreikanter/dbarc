@@ -34,7 +34,15 @@ Linked account: John Doe <john.doe@example.com>
 
 ### Running the Script on Raspberry Pi
 
-Default python3 version on Raspberry Pi at the moment is 3.2, so you will need to upgrade it to 3.3.*. And the best way to do this is through [pyenv](https://github.com/yyuu/pyenv).
+Default python3 version on Raspberry Pi at the moment is 3.2.3, and you will need to upgrade it to 3.3+. The easiest way to do this is [pyenv](https://github.com/yyuu/pyenv). Pyenv will download and build python versions from source code.
+
+There could be errors due insufficient dependencies on Raspbian Wheezy. If you encounter something like "ImportError: No module named 'readline'" during python build, use the following command to install these libraries manually:
+
+```
+sudo apt-get install libreadline-gplv2-dev libssl-dev sqlite3 libsqlite3-dev \  
+python-setuptools python-dev build-essential libxml2-dev libxslt1-dev libbz2-dev \  
+libjpeg62-dev wv poppler-utils python-imaging
+```
 
 ## Usage
 
@@ -54,10 +62,10 @@ dropbox://snippets/EnumExt.cs -> /home/pi/snippets-archive/2013-02/EnumExt.cs
 ...
 ```
 
-Cron tab example to run the script every midnight:
+Cron tab example to run the script every day at 23:59:00:
 
 ```bash
-0 0 * * * dbarc download <source_directory> <local_archive_path>
+59 23 * * * dbarc download <source_directory> <local_archive_path>
 ```
 
 ## License
