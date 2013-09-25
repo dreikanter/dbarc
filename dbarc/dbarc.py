@@ -11,6 +11,7 @@ Options:
   -h --help         Show this help.
   --token=PATH      File location to keep API token [default: ~/.dbarc].
   --struct=PATTERN  Archive dir structure [default: {year}-{month}/{dirname}].
+  --dry-run         Do a dry run.
 """
 
 from datetime import datetime
@@ -37,12 +38,20 @@ def init(key, secret, token_file):
         f.write(access_token)
 
 
-def download(dropbox_dir, dest_dir, dir_struct, token_file):
+def download(dropbox_dir, dest_dir, dir_struct, token_file, dry_run):
     with open(token_file, 'r') as f:
         access_token = f.read().strip()
 
     client = dropbox.client.DropboxClient(access_token)
-    data = client.metadata(dropbox_dir)
+
+    try:
+        data = client.metadata(dropbox_dir)
+    except Exception as e:
+        print('error connecting to dropbox')
+        exit()
+
+    if dry_run:
+        print('doing a dry run')
 
     for item in data['contents']:
         if item['is_dir']:
@@ -50,30 +59,35 @@ def download(dropbox_dir, dest_dir, dir_struct, token_file):
             dirname = os.path.split(item['path'])[1]
             path = dir_struct.format(year=ts.strftime("%Y"),
                                      month=ts.strftime("%m"),
-                                     dirname=dirname)
-            download_dir(client, item['path'], os.path.join(dest_dir, path))
+                                     dirname=dirname,
+                                     dry_run=dry_run)
+            download_dir(client,
+                         dropbox_dir=item['path'],
+                         dest_dir=os.path.join(dest_dir, path),
+                         dry_run=dry_run)
 
 
-def download_dir(client, dropbox_dir, dest_dir):
+def download_dir(client, dropbox_dir, dest_dir, dry_run):
     data = client.metadata(dropbox_dir)
 
-    if not os.path.isdir(dest_dir):
+    if not os.path.isdir(dest_dir) and not dry_run:
         os.makedirs(dest_dir)
 
     for item in data['contents']:
         path = os.path.join(dest_dir, os.path.split(item['path'])[1])
 
         if item['is_dir']:
-            download_dir(client, item['path'], path)
+            download_dir(client, item['path'], path, dry_run)
         else:
             size = item['bytes']
 
             if not os.path.exists(path) or os.path.getsize(path) != size:
                 # file not exists, was not properly downloaded, or was updated
                 print("dropbox://%s -> %s" % (item['path'].lstrip('/'), path))
-                with client.get_file(item['path']) as src:
-                    with open(path, 'wb') as dest:
-                        dest.write(src.read())
+                if not dry_run:
+                    with client.get_file(item['path']) as src:
+                        with open(path, 'wb') as dest:
+                            dest.write(src.read())
 
 
 def main():
@@ -86,4 +100,5 @@ def main():
         download(dropbox_dir=args['<dropbox_dir>'],
                  dest_dir=args['<dest_dir>'],
                  dir_struct=args['--struct'],
-                 token_file=token_file)
+                 token_file=token_file,
+                 dry_run=args['--dry-run'])
